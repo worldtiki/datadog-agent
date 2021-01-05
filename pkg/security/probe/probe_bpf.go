@@ -344,7 +344,7 @@ func (p *Probe) invalidateDentry(mountID uint32, inode uint64, revision uint32) 
 		// after the in-kernel discarder cleanup and thus a discarder will be pushed for a deleted file.
 		// If the inode is reused this can be a problem.
 		// Call a user space remove function to ensure the discarder will be removed.
-		p.removeDiscarderInode(mountID, inode)
+		//p.removeDiscarderInode(mountID, inode)
 	}
 }
 

@@ -25,6 +25,9 @@ struct policy_t {
 
 struct filter_t {
     u64 event_mask;
+    u64 timestamp;
+    u32 is_invalid;
+    u32 padding;
 };
 
 struct bpf_map_def SEC("maps/filter_policy") filter_policy = {
@@ -107,6 +110,15 @@ int __attribute__((always_inline)) discarded_by_inode(u64 event_type, u32 mount_
     struct filter_t *filter = bpf_map_lookup_elem(&inode_discarders, &key);
 
     if (filter && mask_has_event(filter->event_mask, event_type)) {
+        // this discarder has been marked as invalid by event such as unlink, rename, etc.
+        // keep them for a while in the map to avoid userspace to reinsert it
+        if (filter->is_invalid) {
+            if (filter->timestamp < bpf_ktime_get_ns()) {
+                bpf_map_delete_elem(&inode_discarders, &key);
+            }
+            return 0;
+        }
+
 #ifdef DEBUG
         bpf_printk("file with inode %d discarded\n", inode);
 #endif
@@ -124,7 +136,16 @@ void __attribute__((always_inline)) remove_inode_discarder(u32 mount_id, u64 ino
         .revision = get_discarder_revision(mount_id),
     };
 
-    bpf_map_delete_elem(&inode_discarders, &key);
+    u64 mask = 0;
+
+    // do not remove it direclty, first mark it as invalid for a period of time, after that it will be removed
+    struct filter_t filter = {
+        .event_mask = ~mask, // all the events
+        .is_invalid = 1,
+        .timestamp = bpf_ktime_get_ns() + 5000000000, // 5 seconds
+    };
+
+    bpf_map_update_elem(&inode_discarders, &key, &filter, BPF_EXIST);
 }
 
 struct pid_discarder_t {
