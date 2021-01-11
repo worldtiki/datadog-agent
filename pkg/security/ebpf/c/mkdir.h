@@ -23,7 +23,7 @@ long __attribute__((always_inline)) trace__sys_mkdir(umode_t mode) {
 
     cache_syscall(&syscall, EVENT_MKDIR);
 
-    if (discarded_by_process(syscall.policy.mode, EVENT_MKDIR)) {
+    if (is_discarded_by_process(syscall.policy.mode, EVENT_MKDIR)) {
         pop_syscall(SYSCALL_MKDIR);
     }
 

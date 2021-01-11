@@ -19,7 +19,7 @@ int __attribute__((always_inline)) trace__sys_link() {
 
     cache_syscall(&syscall, EVENT_LINK);
 
-    if (discarded_by_process(syscall.policy.mode, EVENT_LINK)) {
+    if (is_discarded_by_process(syscall.policy.mode, EVENT_LINK)) {
         pop_syscall(SYSCALL_LINK);
     }
 

@@ -46,7 +46,7 @@ int __attribute__((always_inline)) trace__sys_openat(int flags, umode_t mode) {
 
     cache_syscall(&syscall, EVENT_OPEN);
 
-    if (discarded_by_process(syscall.policy.mode, EVENT_OPEN)) {
+    if (is_discarded_by_process(syscall.policy.mode, EVENT_OPEN)) {
         pop_syscall(SYSCALL_OPEN);
     }
 

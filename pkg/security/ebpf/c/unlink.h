@@ -51,7 +51,7 @@ int kprobe__vfs_unlink(struct pt_regs *ctx) {
 
     syscall->unlink.overlay_numlower = get_overlay_numlower(dentry);
 
-    if (discarded_by_process(syscall->policy.mode, EVENT_UNLINK)) {
+    if (is_discarded_by_process(syscall->policy.mode, EVENT_UNLINK)) {
         pop_syscall(SYSCALL_UNLINK);
         return 0;
     }

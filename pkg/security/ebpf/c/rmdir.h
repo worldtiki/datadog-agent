@@ -70,7 +70,7 @@ int kprobe__security_inode_rmdir(struct pt_regs *ctx) {
             break;
     }
 
-    if (discarded_by_process(syscall->policy.mode, event_type)) {
+    if (is_discarded_by_process(syscall->policy.mode, event_type)) {
         invalidate_inode(ctx, key.mount_id, key.ino, 1);
 
         return 0;

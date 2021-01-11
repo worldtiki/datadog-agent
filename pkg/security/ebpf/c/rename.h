@@ -91,7 +91,7 @@ int __attribute__((always_inline)) trace__sys_rename_ret(struct pt_regs *ctx) {
     invalidate_inode(ctx, syscall->rename.target_key.mount_id, syscall->rename.target_key.ino, 1);
 
     // If we are discarded, we still want to invalidate the inode
-    if (discarded_by_process(syscall->policy.mode, EVENT_RENAME) || (IS_UNHANDLED_ERROR(retval))) {
+    if (is_discarded_by_process(syscall->policy.mode, EVENT_RENAME) || (IS_UNHANDLED_ERROR(retval))) {
         return 0;
     }
 

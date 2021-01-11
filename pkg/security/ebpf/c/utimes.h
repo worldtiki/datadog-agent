@@ -28,7 +28,7 @@ int __attribute__((always_inline)) trace__sys_utimes() {
 
     cache_syscall(&syscall, EVENT_UTIME);
 
-    if (discarded_by_process(syscall.policy.mode, EVENT_UTIME)) {
+    if (is_discarded_by_process(syscall.policy.mode, EVENT_UTIME)) {
         pop_syscall(SYSCALL_UTIME);
     }
 

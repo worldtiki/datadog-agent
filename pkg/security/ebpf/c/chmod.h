@@ -23,7 +23,7 @@ int __attribute__((always_inline)) trace__sys_chmod(umode_t mode) {
 
     cache_syscall(&syscall, EVENT_CHMOD);
 
-    if (discarded_by_process(syscall.policy.mode, EVENT_CHMOD)) {
+    if (is_discarded_by_process(syscall.policy.mode, EVENT_CHMOD)) {
         pop_syscall(SYSCALL_CHMOD);
     }
 

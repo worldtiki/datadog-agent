@@ -10,41 +10,43 @@ package probe
 import (
 	"time"
 
-	libebpf "github.com/DataDog/ebpf"
-
+	"github.com/DataDog/datadog-agent/pkg/security/ebpf"
 	"github.com/DataDog/datadog-agent/pkg/security/rules"
 	"github.com/DataDog/datadog-agent/pkg/security/secl/eval"
 )
 
-type pidDiscarderParameters struct {
-	EventType  EventType
-	Timestamps [maxEventRoundedUp]uint64
+const (
+	DiscardInodeOp = 1
+	DiscardPidOp
+)
+
+func discardMarshalHeader(req *ERPCRequest, eventType EventType, timeout uint64) int {
+	ebpf.ByteOrder.PutUint64(req.Data[0:8], uint64(eventType))
+	ebpf.ByteOrder.PutUint64(req.Data[8:16], uint64(timeout))
+
+	return 16
 }
 
 func (p *Probe) discardPID(eventType EventType, pid uint32) error {
-	var params pidDiscarderParameters
-
-	updateFlags := libebpf.UpdateExist
-	if err := p.pidDiscarders.Lookup(pid, &params); err != nil {
-		updateFlags = libebpf.UpdateAny
+	req := ERPCRequest{
+		OP: DiscardPidOp,
 	}
 
-	params.EventType |= 1 << (eventType - 1)
-	return p.pidDiscarders.Update(pid, &params, updateFlags)
+	offset := discardMarshalHeader(&req, eventType, 0)
+	ebpf.ByteOrder.PutUint32(req.Data[offset:offset+4], pid)
+
+	return p.erpc.Request(&req)
 }
 
 func (p *Probe) discardPIDWithTimeout(eventType EventType, pid uint32, timeout time.Duration) error {
-	var params pidDiscarderParameters
-
-	updateFlags := libebpf.UpdateExist
-	if err := p.pidDiscarders.Lookup(pid, &params); err != nil {
-		updateFlags = libebpf.UpdateAny
+	req := ERPCRequest{
+		OP: DiscardPidOp,
 	}
 
-	params.EventType |= 1 << (eventType - 1)
-	params.Timestamps[eventType] = uint64(p.resolvers.TimeResolver.ComputeMonotonicTimestamp(time.Now().Add(timeout)))
+	offset := discardMarshalHeader(&req, eventType, uint64(timeout.Nanoseconds()))
+	ebpf.ByteOrder.PutUint32(req.Data[offset:offset+4], pid)
 
-	return p.pidDiscarders.Update(pid, &params, updateFlags)
+	return p.erpc.Request(&req)
 }
 
 type inodeDiscarder struct {
@@ -68,22 +70,15 @@ func (p *Probe) removeDiscarderInode(mountID uint32, inode uint64) {
 }
 
 func (p *Probe) discardInode(eventType EventType, mountID uint32, inode uint64) error {
-	var params inodeDiscarderParameters
-	key := inodeDiscarder{
-		PathKey: PathKey{
-			MountID: mountID,
-			Inode:   inode,
-		},
-		Revision: p.getDiscarderRevision(mountID),
+	req := ERPCRequest{
+		OP: DiscardInodeOp,
 	}
 
-	updateFlags := libebpf.UpdateExist
-	if err := p.inodeDiscarders.Lookup(key, &params); err != nil {
-		updateFlags = libebpf.UpdateAny
-	}
+	offset := discardMarshalHeader(&req, eventType, 0)
+	ebpf.ByteOrder.PutUint64(req.Data[offset:offset+8], inode)
+	ebpf.ByteOrder.PutUint32(req.Data[offset+8:offset+12], mountID)
 
-	params.EventType |= 1 << (eventType - 1)
-	return p.inodeDiscarders.Update(&key, &params, updateFlags)
+	return p.erpc.Request(&req)
 }
 
 func (p *Probe) discardParentInode(rs *rules.RuleSet, eventType EventType, field eval.Field, filename string, mountID uint32, inode uint64, pathID uint32) (bool, uint32, uint64, error) {

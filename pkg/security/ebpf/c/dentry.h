@@ -223,7 +223,7 @@ static __attribute__((always_inline)) int resolve_dentry(struct dentry *dentry, 
 
         // discard filename and its parent only in order to limit the number of lookup
         if (event_type && i < 2) {
-            if (discarded_by_inode(event_type, key.mount_id, key.ino)) {
+            if (is_discarded_by_inode(event_type, key.mount_id, key.ino)) {
                 return DENTRY_DISCARDED;
             }
         }

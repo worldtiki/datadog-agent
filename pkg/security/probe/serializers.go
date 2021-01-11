@@ -340,8 +340,10 @@ func newEventSerializer(event *Event) (*EventSerializer, error) {
 		s.EventContextSerializer.Outcome = serializeSyscallRetval(event.Umount.Retval)
 	case ForkEventType:
 		s.EventContextSerializer.Outcome = serializeSyscallRetval(0)
+		s.Category = ProcessActivity
 	case ExitEventType:
 		s.EventContextSerializer.Outcome = serializeSyscallRetval(0)
+		s.Category = ProcessActivity
 	case ExecEventType:
 		s.FileEventSerializer = &FileEventSerializer{
 			FileSerializer: *newFileSerializer(&event.processCacheEntry.FileEvent, event),
