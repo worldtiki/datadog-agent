@@ -75,6 +75,7 @@ func processDeploymentList(deploymentList []*v1.Deployment, groupID int32, cfg *
 	}
 
 	log.Debugf("Collected & enriched %d out of %d deployments in %s", len(deployMsgs), len(deploymentList), time.Now().Sub(start))
+	log.Debugf("Deployment messages to send: %v", messages)
 	return messages, nil
 }
 
