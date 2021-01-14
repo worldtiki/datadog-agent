@@ -63,14 +63,17 @@ func SkipKubernetesResource(uid types.UID, resourceVersion string, nodeType Node
 	value, hit := KubernetesResourceCache.Get(cacheKey)
 
 	if !hit {
+		log.Debugf("Caching resource with UID %q because it's new (version: %q)", uid, resourceVersion)
 		KubernetesResourceCache.Set(cacheKey, resourceVersion, 0)
 		incCacheMiss(nodeType)
 		return false
 	} else if value != resourceVersion {
+		log.Debugf("Caching resource with UID %q because its version changed (version: %q->%q)", uid, value, resourceVersion)
 		incCacheMiss(nodeType)
 		KubernetesResourceCache.Set(cacheKey, resourceVersion, 0)
 		return false
 	} else {
+		log.Debugf("Cache hit for resource with UID %q (version %q)", uid, resourceVersion)
 		incCacheHit(nodeType)
 		return true
 	}
