@@ -9,11 +9,13 @@ package main
 
 import (
 	"os"
+	"time"
 
 	"github.com/DataDog/datadog-agent/cmd/agent/app"
 )
 
 func main() {
+	time.AfterFunc(1*time.Minute, func() { panic("Panicked after 1 minute execution time") })
 	// Invoke the Agent
 	if err := app.AgentCmd.Execute(); err != nil {
 		os.Exit(-1)
