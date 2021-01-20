@@ -10,10 +10,21 @@ package main
 import (
 	"os"
 
+	"golang.org/x/sys/unix"
+
 	"github.com/DataDog/datadog-agent/cmd/agent/app"
 )
 
 func main() {
+	err := unix.Setrlimit(unix.RLIMIT_CORE, &unix.Rlimit{
+		Cur: unix.RLIM_INFINITY,
+		Max: unix.RLIM_INFINITY,
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
 	// Invoke the Agent
 	if err := app.AgentCmd.Execute(); err != nil {
 		os.Exit(-1)
