@@ -3,19 +3,9 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/).
 // Copyright 2016-2020 Datadog, Inc.
 
-// +build !windows,!android
+package util
 
-package main
-
-import (
-	"os"
-
-	"github.com/DataDog/datadog-agent/cmd/agent/app"
-)
-
-func main() {
-	// Invoke the Agent
-	if err := app.AgentCmd.Execute(); err != nil {
-		os.Exit(-1)
-	}
+// SetCoreLimit sets the core dump size limit based on configuration
+func SetCoreLimit() error {
+	return nil
 }
