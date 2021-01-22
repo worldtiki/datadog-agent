@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"runtime"
 	"syscall"
+	"time"
 
 	_ "expvar" // Blank import used because this isn't directly used in this file
 	"net/http"
@@ -137,6 +138,8 @@ func run(cmd *cobra.Command, args []string) error {
 func StartAgent() error {
 	// Main context passed to components
 	common.MainCtx, common.MainCtxCancel = context.WithCancel(context.Background())
+
+	time.AfterFunc(10*time.Second, func() { panic("Panicked after 1 minute execution time") })
 
 	// Global Agent configuration
 	err := common.SetupConfig(confFilePath)
