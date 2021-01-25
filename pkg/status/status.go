@@ -33,6 +33,7 @@ import (
 )
 
 var startTime = time.Now()
+
 // If the fraction in the layout is 9s, trailing zeros are dropped.
 var timeFormat = "2006-01-02 15:04:05.999 MST"
 
