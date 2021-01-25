@@ -9,6 +9,8 @@ package probe
 
 import (
 	"github.com/DataDog/datadog-agent/pkg/security/ebpf"
+	"github.com/DataDog/datadog-agent/pkg/security/rules"
+	"github.com/DataDog/datadog-agent/pkg/security/secl/eval"
 )
 
 type onApproverHandler func(probe *Probe, approvers rules.Approvers) (activeApprovers, error)

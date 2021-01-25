@@ -27,28 +27,6 @@ import (
 	"github.com/DataDog/datadog-agent/pkg/security/utils"
 )
 
-var (
-	dentryInvalidDiscarder = []interface{}{dentryPathKeyNotFound}
-)
-
-// InvalidDiscarders exposes list of values that are not discarders
-var InvalidDiscarders = map[eval.Field][]interface{}{
-	"open.filename":        dentryInvalidDiscarder,
-	"unlink.filename":      dentryInvalidDiscarder,
-	"chmod.filename":       dentryInvalidDiscarder,
-	"chown.filename":       dentryInvalidDiscarder,
-	"mkdir.filename":       dentryInvalidDiscarder,
-	"rmdir.filename":       dentryInvalidDiscarder,
-	"rename.old.filename":  dentryInvalidDiscarder,
-	"rename.new.filename":  dentryInvalidDiscarder,
-	"utimes.filename":      dentryInvalidDiscarder,
-	"link.source.filename": dentryInvalidDiscarder,
-	"link.target.filename": dentryInvalidDiscarder,
-	"process.filename":     dentryInvalidDiscarder,
-	"setxattr.filename":    dentryInvalidDiscarder,
-	"removexattr.filename": dentryInvalidDiscarder,
-}
-
 // ErrNotEnoughData is returned when the buffer is too small to unmarshal the event
 var ErrNotEnoughData = errors.New("not enough data")
 
