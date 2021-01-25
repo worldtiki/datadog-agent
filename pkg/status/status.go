@@ -33,7 +33,8 @@ import (
 )
 
 var startTime = time.Now()
-var timeFormat = "2006-01-02 15:04:05.000 MST"
+// If the fraction in the layout is 9s, trailing zeros are dropped.
+var timeFormat = "2006-01-02 15:04:05.999 MST"
 
 // GetStatus grabs the status from expvar and puts it into a map
 func GetStatus() (map[string]interface{}, error) {

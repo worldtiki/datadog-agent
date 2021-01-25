@@ -107,23 +107,24 @@ func lastErrorMessage(value string) string {
 }
 
 // formatUnixTime formats the unix time to make it more readable
-func formatUnixTime(unixTime float64, isNanoSeconds bool) string {
+func formatUnixTime(unixTime float64) string {
 	var (
 		sec  int64
 		nsec int64
 	)
+	t := time.Unix(0, int64(unixTime))
 
-	if isNanoSeconds {
-		nsec = int64(unixTime)
-	} else {
+	if t.Year() == time.Unix(0, 0).Year() {
+		// Assume unixTime is in seconds if year returned 1970
 		ts := fmt.Sprintf("%f", unixTime)
 		secs := strings.Split(ts, ".")
 		sec, _ = strconv.ParseInt(secs[0], 10, 64)
 		if len(secs) == 2 {
 			nsec, _ = strconv.ParseInt(secs[1], 10, 64)
 		}
+		t = time.Unix(sec, nsec)
 	}
-	t := time.Unix(sec, nsec)
+
 	_, tzoffset := t.Zone()
 	result := t.Format(timeFormat)
 	if tzoffset != 0 {
