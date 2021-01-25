@@ -7,4 +7,4 @@ import (
 	"github.com/DataDog/datadog-agent/pkg/ebpf"
 )
 
-var RuntimeSecurity = ebpf.NewRuntimeAsset("runtime-security.c", "de9d98631e5d84f8646e23b4c8738bae0d6aac936973b696504453fbdb048a4f")
+var RuntimeSecurity = ebpf.NewRuntimeAsset("runtime-security.c", "52edc3638b9cece6bea14a10d388963fe349a0de0fa29ee02481dd6d6fb08959")
