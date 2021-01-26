@@ -45,19 +45,20 @@ type FileSerializer struct {
 // UserContextSerializer serializes a user context to JSON
 // easyjson:json
 type UserContextSerializer struct {
-	User  string `json:"user,omitempty"`
+	User  string `json:"id,omitempty"`
 	Group string `json:"group,omitempty"`
 }
 
 // ProcessCacheEntrySerializer serializes a process cache entry to JSON
 // easyjson:json
 type ProcessCacheEntrySerializer struct {
-	UserContextSerializer
 	Pid                 uint32     `json:"pid,omitempty"`
 	PPid                uint32     `json:"ppid,omitempty"`
 	Tid                 uint32     `json:"tid,omitempty"`
 	UID                 uint32     `json:"uid,omitempty"`
 	GID                 uint32     `json:"gid,omitempty"`
+	User                string     `json:"user,omitempty"`
+	Group               string     `json:"group,omitempty"`
 	Name                string     `json:"name,omitempty"`
 	ContainerPath       string     `json:"executable_container_path,omitempty"`
 	Path                string     `json:"executable_path,omitempty"`
@@ -179,15 +180,13 @@ func newProcessCacheEntrySerializer(pce *ProcessCacheEntry, e *Event, r *Resolve
 	}
 
 	return &ProcessCacheEntrySerializer{
-		UserContextSerializer: UserContextSerializer{
-			User:  user,
-			Group: group,
-		},
 		Pid:                 pid,
 		PPid:                ppid,
 		Tid:                 tid,
 		UID:                 uid,
 		GID:                 gid,
+		User:                user,
+		Group:               group,
 		Name:                pce.ResolveName(e),
 		Path:                pce.ResolveInodeWithResolvers(r),
 		PathResolutionError: pce.GetPathResolutionError(),
@@ -269,7 +268,8 @@ func newEventSerializer(event *Event) *EventSerializer {
 		s.ContainerContextSerializer = newContainerContextSerializer(&event.Container, event)
 	}
 
-	s.UserContextSerializer = s.ProcessContextSerializer.UserContextSerializer
+	s.UserContextSerializer.User = s.ProcessContextSerializer.User
+	s.UserContextSerializer.Group = s.ProcessContextSerializer.Group
 
 	switch EventType(event.Type) {
 	case FileChmodEventType:
